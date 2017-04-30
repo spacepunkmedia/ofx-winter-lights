@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+#include "ofxSyphon.h"
 
 class Line {
 public:
@@ -49,4 +50,8 @@ class ofApp : public ofBaseApp{
     
 		
         int threshold;
+        int lineWidth;
+    
+        ofxSyphonServer mainOutputSyphonServer;
+        bool	bSmooth;
 };

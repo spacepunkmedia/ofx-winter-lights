@@ -18,6 +18,8 @@ void ofApp::setup(){
     grayImage.allocate(kinect.width, kinect.height);
     
     threshold = 80;
+    lineWidth = 1;
+    
     hue = 0;
     lineColor.setHsb(hue, 255, 255);
     
@@ -32,12 +34,19 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofBackground(0, 0, 0);
-    ofHideCursor();
+    
+    //Syphon settings
+    bSmooth = false;
+    ofSetWindowTitle("winter-lights-festival");
+    
+    mainOutputSyphonServer.setName("Screen Output");
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    //ofSetLineWidth(lineWidth);
     
     //ofBackground(100, 100, 100);
     
@@ -78,13 +87,14 @@ void ofApp::update(){
     }
     
     //Cycles the HUE of the lineColor ofColor
-    hue += 1;
+    /*hue += 1;
     if(hue > 255){hue = 0;};
     lineColor.setHsb(hue, 100, 255);
+    */
     
     //Checks the ammount of time since a line was added, if its over X seconds
     //then the vectors are cleared and the elapsed time is reset
-    if(ofGetElapsedTimef() > 20){
+    if(ofGetElapsedTimef() > 10){
         drawnPoints.clear();
         lines.clear();
         ofResetElapsedTimeCounter();
@@ -98,6 +108,10 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    //clears the background for compositing later if you so choose
+    //glClearColor(0.0, 0.0, 0.0, 0.0);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     /*
     //draw the kinect image
     kinect.draw(0, 0, kinect.width, kinect.height);
@@ -107,18 +121,22 @@ void ofApp::draw(){
     contourFinder.draw(kinect.width, 0, kinect.width, kinect.height);
      */
     
-    ofEnableAntiAliasing();
+    //ofEnableAntiAliasing();
     ofEnableAlphaBlending();
-    ofSetColor(lineColor, 30);
+    ofSetColor(lineColor);
     
     //Draw the lines on the screen as stored in the Line class 'lines'
     for (auto line : lines){
         ofDrawLine(line.a, line.b);
     }
     
-    ofNoFill();
+    mainOutputSyphonServer.publishScreen();
+    
+    /*
+     ofNoFill();
     ofSetColor(0, 0, 0, 30);
     ofDrawRectangle(0, 0, kinect.width, kinect.height);
+     */
     
     //Report information about the kinect onto the screen
     stringstream reportBlobPos;
@@ -126,15 +144,16 @@ void ofApp::draw(){
 
         int blobX = contourFinder.blobs[i].centroid.x;
         int blobY = contourFinder.blobs[i].centroid.y;
-        ofSetColor(255, 0, 0);
-        ofFill();
-        ofDrawCircle(blobX, blobY, 5);
+        
+        //ofSetColor(255, 0, 0);
+        //ofFill();
+        //ofDrawCircle(blobX, blobY, 5);
     
         reportBlobPos << "x of blob_" << i << " " << blobX << " y of blob_" << i << " " << blobY << endl;
     }
     ofSetHexColor(0xffffff);
     stringstream reportStr;
-    reportStr << "threshold " << threshold << " (press: +/-)" << endl
+    reportStr << "threshold " << threshold << " (press: +/-)" << endl << "line width " << lineWidth << " (press: l/k)" << endl
     << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate() << endl << reportBlobPos.str();
     ofDrawBitmapString(reportStr.str(), 20, kinect.height + 50);
     
@@ -155,6 +174,16 @@ void ofApp::keyPressed(int key){
         case 'r':
             lines.clear();
             drawnPoints.clear();
+            break;
+        case 'l':
+            lineWidth++;
+            break;
+        case 'k':
+            lineWidth--;
+            break;
+        case 's':
+            bSmooth = !bSmooth;
+            break;
     }
     
 
