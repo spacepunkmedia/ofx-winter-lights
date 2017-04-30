@@ -1,7 +1,7 @@
 # ofx-winter-lights
 By hacking a common tool and medium, paint.IR allows the user to explore the art of spray painting with a new-media twist. Featured at Portland's Winter Light Festival, visitors were invited to spray paint light onto OMSI walls, exploring their creativity, collaborating with others, and contributing their work to the wonderful collection presented in the festival.
 
-# (video)
+# video:
 https://vimeo.com/207905122
 
 # design:
